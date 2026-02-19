@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -21,8 +22,8 @@ public class FirebaseStorageService {
     // Aquí se manejaría la inyección del cliente de Storage como un bean
     private final Storage storage;
 
-    public FirebaseStorageService(Storage storage) {
-        this.storage = storage;
+    public FirebaseStorageService(Optional<Storage> storage) {
+        this.storage = storage.orElse(null);
     }
 
     //Sube un archivo de imagen al almacenamiento de Firebase.    
@@ -59,6 +60,9 @@ public class FirebaseStorageService {
 
     //Sube el archivo al almacenamiento de Firebase y genera una URL firmada.     
     private String uploadToFirebase(File file, String folder, String fileName) throws IOException {
+        if (storage == null) {
+            throw new IOException("Firebase Storage no esta configurado en este entorno");
+        }
         // Definimos el ID del blob y su información
         BlobId blobId = BlobId.of(bucketName, storagePath + "/" + folder + "/" + fileName);
         String mimeType = Files.probeContentType(file.toPath());
