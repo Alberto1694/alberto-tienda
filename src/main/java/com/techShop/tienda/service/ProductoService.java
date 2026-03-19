@@ -31,6 +31,11 @@ public class ProductoService {
     }
 
     @Transactional(readOnly = true)
+    public List<Producto> getProductosPorCategoria(Integer idCategoria) {
+        return productoRepository.findByIdCategoria(idCategoria);
+    }
+
+    @Transactional(readOnly = true)
     public Optional<Producto> getProducto(Integer idProducto) {
         return productoRepository.findById(idProducto);
     }
@@ -64,5 +69,25 @@ public class ProductoService {
             // Lanza una nueva excepción para encapsular el problema de integridad de datos
             throw new IllegalStateException("No se puede eliminar la producto. Tiene datos asociados.", e);
         }
+    }
+
+    @Transactional(readOnly = true)
+    public List<Producto> consultaDerivada(double precioInf, double precioSup) {
+        return productoRepository.findByPrecioBetweenOrderByPrecioAsc(precioInf, precioSup);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Producto> consultaJPQL(double precioInf, double precioSup) {
+        return productoRepository.consultaJPQL(precioInf, precioSup);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Producto> consultaSQL(double precioInf, double precioSup) {
+        return productoRepository.consultaSQL(precioInf, precioSup);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Producto> consultaExistenciasMin(int existenciasMin) {
+        return productoRepository.findByExistenciasGreaterThanEqualOrderByExistenciasDesc(existenciasMin);
     }
 }
