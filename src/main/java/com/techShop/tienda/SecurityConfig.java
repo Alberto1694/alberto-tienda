@@ -24,6 +24,10 @@ public class SecurityConfig {
         var rutas = rutaService.getRutas();
 
         http.authorizeHttpRequests(requests -> {
+            // Fallback mínimo para acceso base y recursos estáticos
+            requests.requestMatchers("/", "/error",
+                    "/css/**", "/js/**", "/img/**", "/audios/**", "/videos/**", "/fav/**", "/webjars/**")
+                    .permitAll();
             for (Ruta ruta : rutas) {
                 if (ruta.isRequiereRol()) {
                     requests.requestMatchers(ruta.getRuta()).hasRole(ruta.getRol().getRol());
@@ -33,11 +37,8 @@ public class SecurityConfig {
             }
             requests.anyRequest().authenticated();
         });
-        http.formLogin(form -> form // Configuración de formulario de login
-                .loginPage("/login")
-                .loginProcessingUrl("/login")
+        http.formLogin(form -> form
                 .defaultSuccessUrl("/", true)
-                .failureUrl("/login?error=true")
                 .permitAll()
         ).logout(logout -> logout // Configuración de logout
                 .logoutUrl("/logout")

@@ -25,7 +25,10 @@
 <section th:fragment="tarjetas" class="container py-4">
     <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xl-4 g-4">
         <div th:each="p : ${productos}" class="col">
-            <div class="card h-100 shadow-sm">
+            <div class="card h-100 shadow-sm"
+                 th:classappend="${p.existencias > 0} ? ' producto-clickable'"
+                 th:attr="data-url=@{/producto/detalle/{id}(id=${p.idProducto})}"
+                 onclick="goToProductDetail(this)">
                 <div class="d-flex justify-content-center align-items-center bg-light p-3" style="height: 200px;">
                     <img th:src="${p.rutaImagen}" class="img-fluid" 
                          th:alt="${p.descripcion}" 
@@ -43,12 +46,12 @@
                         <span th:if="${p.existencias > 0}" class="badge text-bg-success ms-2" th:text="${p.existencias} + ' unidades'"></span>
                         <span th:unless="${p.existencias > 0}" class="badge text-bg-danger ms-2">Agotado</span>
                     </div>
-                    <form th:action="@{/carrito/agregar}" th:method="POST" class="d-inline">
+                    <form th:action="@{/carrito/agregar}" th:method="POST" class="d-inline" onclick="event.stopPropagation();">
                         <input type="hidden" th:value="${p.idProducto}" name="idProducto"/>
-                        <button type="submit" 
+                        <button type="button" 
                                 class="btn btn-sm btn-primary" 
                                 th:disabled="${p.existencias == 0}"
-                                onclick="addCart(this.form)">
+                                onclick="event.stopPropagation(); addCart(this.form); return false;">
                             <i class="fas fa-cart-plus"></i>
                         </button>
                     </form>
@@ -63,7 +66,25 @@
     <div th:replace="~{consultas/fragmentos :: formConsulta('primary',#{consultas.derivadas},'/consultas/consultaDerivada')}"/>
     <div th:replace="~{consultas/fragmentos :: formConsulta('warning',#{consultas.jpql},'/consultas/consultaJPQL')}"/>
     <div th:replace="~{consultas/fragmentos :: formConsulta('success',#{consultas.sql},'/consultas/consultaSQL')}"/>
-    <div class='card'><p>Acá va su Práctica #2</p></div>
+    <div class='card p-2'>
+        <div class="card-header text-center text-white bg-info">
+            <h5>Consulta por existencias</h5>
+        </div>
+        <form method="post" th:action='@{/consultas/consultaExistencias}' class='was-validated'>
+            <div class="card-body">
+                <div class='mb-3'>
+                    <label>Existencias minimas</label>
+                    <input type="number" name='existenciasMin' th:value='${existenciasMin}'
+                           class='form-control' min="0" required/>
+                </div>
+            </div>
+            <div class="card-footer text-center">
+                <button type='submit' class='btn btn-info text-white'>
+                    <i class='fa-solid fa-magnifying-glass'></i> Buscar
+                </button>
+            </div>
+        </form>
+    </div>
 </section>
 
 <!-- fragmento 4 para mostrar el formulario factorizado -->

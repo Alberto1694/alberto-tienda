@@ -82,4 +82,15 @@ public class ProductoController {
         model.addAttribute("categorias", categorias);
         return "/producto/modifica";
     }
+
+    @GetMapping("/detalle/{idProducto}")
+    public String detalle(@PathVariable("idProducto") Integer idProducto, Model model, RedirectAttributes redirectAttributes) {
+        Optional<Producto> productoOpt = productoService.getProducto(idProducto);
+        if (productoOpt.isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", messageSource.getMessage("producto.error01", null, Locale.getDefault()));
+            return "redirect:/";
+        }
+        model.addAttribute("producto", productoOpt.get());
+        return "/producto/detalle";
+    }
 }
